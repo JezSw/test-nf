@@ -1,0 +1,72 @@
+# Uses https://github.com/GlobalPathogenAnalysisService/sp3-oci-rm/blob/main/scripts/oraclek8s.yaml to get started
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: default-nextflow-sa-pods-management
+  namespace: default
+  labels:
+    app.kubernetes.io/name: default-rabc-settings
+    app.kubernetes.io/tier: settings
+    app.kubernetes.io/version: 1.0.0
+rules:
+  -
+    apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - delete
+  -
+    apiGroups:
+      - ""
+    resources:
+      - pods/status
+    verbs:
+      - get
+      - watch
+      - list
+  -
+    apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+      - watch
+      - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: default-nextflow-sa-pods-management-rb
+  namespace: default
+  labels:
+    app.kubernetes.io/name: default-rabc-settings
+    app.kubernetes.io/tier: settings
+    app.kubernetes.io/version: 1.0.0
+subjects:
+  - kind: ServiceAccount
+    name: default-nextflow-sa
+    namespace: default
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  apiGroup: ""
+  kind: Role
+  name: default-nextflow-sa-pods-management
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default-nextflow-sa
+  namespace: default
+  labels:
+    app.kubernetes.io/name: default-rabc-settings
+    app.kubernetes.io/tier: settings
+    app.kubernetes.io/version: 1.0.0
